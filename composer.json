@@ -1,0 +1,16 @@
+{
+    "name": "joomla/extension-builder",
+    "description": "Build a Joomla Extension into a zip file that can be installed in the Admin interface",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Ryan Seal",
+            "email": "allegedlin@gmail.com",
+            "homepage": "http://code.splrk.net",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "phing/phing": "2.*"
+    }
+}
