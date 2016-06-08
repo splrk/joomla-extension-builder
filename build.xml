@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="joomlabuild" default="prepare">
-    <includepath classpath="classes" />
+<project name="joomlaextensionbuilder" default="prepare">
+    <includepath classpath="${phing.dir.joomlaextensionbuilder}/classes" />
     <taskdef name="readjoomlamanifest" classname="ReadJoomlaManifestTask" />
     <taskdef name="uniquekey" classname="UniqueKeyTask" />
     
