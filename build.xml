@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="joomlaextensionbuilder" default="prepare">
+    <includepath classpath="${phing.dir.joomlaextensionbuilder}/classes" />
+    <taskdef name="readjoomlamanifest" classname="ReadJoomlaManifestTask" />
+    <taskdef name="uniquekey" classname="UniqueKeyTask" />
+    
+    <target name="createzip" depends="parsexml">
+        <if>
+            <isset property="joomla.name" />
+            <then>
+                <echo message="Extension Name: ${joomla.name}" />
+                <echo message="Extension Type: ${joomla.type}" />
+                <echo message="Target Joomla Version: ${joomla.jver}" />
+
+                <property name="zipfile" value="${joomla.type_prefix}_${joomla.name}_${joomla.jver}.zip" />
+                
+                <delete file="${zipfile}" />
+                
+                <resolvepath propertyName="name_xml" file="${joomla.name}.xml" />
+                <if>
+                    <and>
+                        <not>
+                            <equals arg1="${xmlmanifest}" arg2="${name_xml}" />
+                        </not>
+                        <available file="${name_xml}" />
+                    </and>
+                    <then>
+                        <move file="${joomla.name}.xml" tofile=".${current_run_key}_${joomla.name}.xml" overwrite="true"/>
+                    </then>
+                </if>
+                
+                <copy file=".${current_run_key}_${manifestbasename}" tofile="${joomla.name}.xml" overwrite="true"/>
+                
+                <zip destfile="${zipfile}">
+                    <fileset dir="." includes="${joomla.includes},${joomla.name}.xml" excludes="**.sw?"/>
+                </zip>
+                
+                <if>
+                    <and>
+                        <isset property="copyto.dir" />
+                        <available file="${copyto.dir}" />
+                    </and>
+                    <then>
+                        <copy file="${joomla.name}_${joomla.jver}.zip" todir="${copyto.dir}" />
+                    </then>
+                </if>
+                
+                <if>
+                    <equals arg1="${xmlmanifest}" arg2="${name_xml}" />
+                    <then>
+                        <move file=".${current_run_key}_${joomla.name}.xml" tofile="${joomla.name}.xml" overwrite="true"/>
+                    </then>
+                    <else>
+                        <delete file="${joomla.name}.xml" />
+                    </else>
+                </if>
+                <delete file=".${current_run_key}_${manifestbasename}" />
+            </then>
+        </if>
+    </target>
+    
+    <target name="parsexml">
+        <echo message="Reading ${xmlfile}" />
+        <uniquekey property="current_run_key" length="5" />
+        <resolvepath propertyName="xmlmanifest" file="${xmlfile}" />
+        <basename property="manifestbasename" file="${xmlmanifest}" />
+
+        <trycatch property="errormessage">
+            <try>
+               <readjoomlamanifest manifest="${xmlmanifest}" tempmanifest=".${current_run_key}_${manifestbasename}" propertiesprefix="joomla" />
+            </try>
+            <catch>
+                <echo message="${errormessage}" level="error" />
+                <echo message="Skipping manifest file: ${xmlfile}" /> 
+            </catch>
+        </trycatch>
+   </target>
+
+   <target name="prepare">
+        
+        <foreach param="xmlfile" target="createzip">
+            <fileset dir="." includes="*.xml" excludes=".*.xml" />
+        </foreach>
+    
+    </target>
+	
+    <target name="copyfiles" depends="parsexml">
+        <if>
+            <isset property="joomla.name" />
+            <then>
+                <property
+                    name="joomla.directory"
+                    value="${joomla.subdir}/${joomla.type_prefix}_${joomla.name}/" />
+
+                <copy todir="${joomla.base_dir}/${joomla.directory}" >
+                    <fileset includes="${joomla.includes}">
+                        <filename name="{jooma.site_folder}/**" />
+                        <exclude name="language*/**/*.*" />
+                    </fileset>
+                </copy>
+     
+               <copy todir="${joomla.base_dir}/languages" >
+                    <fileset includes="${joomla.includes}">
+                        <filename name="{jooma.admin_folder}/language*/**" />
+                    </fileset>
+                </copy>
+ 
+
+                <copy todir="${joomla.base_dir}/administrator/${joomla.directory}" >
+                    <fileset includes="${joomla.includes}">
+                        <filename name="{jooma.admin_folder}/**" />
+                        <exclude name="language*/**/*.*" />
+                    </fileset>
+               </copy>
+    
+               <copy todir="${joomla.base_dir}/administrator/languages" >
+                    <fileset includes="${joomla.includes}">
+                        <filename name="{jooma.admin_folder}/language*/**" />
+                    </fileset>
+                </copy>
+        
+            </then> 
+        </if>        
+        
+    </target>
+        
+</project>
