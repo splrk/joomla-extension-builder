@@ -2,6 +2,7 @@
     "name": "joomla/extension-builder",
     "description": "Build a Joomla Extension into a zip file that can be installed in the Admin interface",
     "type": "library",
+    "version": "0.1.1",
     "authors": [
         {
             "name": "Ryan Seal",
