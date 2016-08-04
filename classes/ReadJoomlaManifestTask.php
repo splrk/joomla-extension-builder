@@ -159,12 +159,10 @@ class ReadJoomlaManifestTask extends Task
     ) {
         foreach ($this->manifest->xpath($xpath) as $element) {
             $index_dirs = array();
-            $base_dir = (!is_null($basedir_xpath) ?
-                (string) $this->manifest->xpath($basedir_xpath)[0]['folder'] :
-                (string) $element['folder']);
+            $base_dir = (string) $element['folder'];
 
             foreach ($element->$filename_element as $filename) {
-                $this->includesArray[] = $base_dir . '/' . (string) $filename;
+                $this->includesArray[] = ($base_dir ? $base_dir . '/' : '') . (string) $filename;
                 $this->addNewDirs($base_dir, $filename, $index_dirs);
             }
 
